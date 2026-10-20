@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tahfidz After School - SD Islam Tahfidz Cahaya Qur'an</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-emerald-theme { background: linear-gradient(135deg, #065f46 0%, #047857 50%, #022c22 100%); }
+        .text-gold { color: #f59e0b; }
+        .border-gold { border-color: #f59e0b; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <!-- Header Tema Poster -->
+    <header class="bg-emerald-theme text-white shadow-lg border-b-4 border-amber-400">
+        <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <span class="bg-amber-400 text-slate-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">SD Islam Tahfidz Cahaya Qur'an</span>
+                <h1 class="text-3xl font-extrabold mt-2 tracking-wide text-amber-200">Tahfidz After School</h1>
+                <p class="text-xs text-emerald-100 italic mt-1">"Mencetak Generasi Qur'ani, Berilmu dan Berakhlak Mulia"</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md px-4 py-3 rounded-xl border border-white/20 text-right text-xs">
+                <div class="font-semibold text-amber-300">Waktu & Jadwal:</div>
+                <div>Selasa s.d Kamis (Pkl. 16.00 - 17.30 WIB)</div>
+                <div class="mt-1 text-emerald-200">1 Halaqah = Maksimal 6 Murid</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigasi Utama -->
+    <div class="max-w-6xl mx-auto px-4 mt-6">
+        <div class="flex flex-wrap justify-center gap-2 mb-6">
+            <button onclick="switchView('input')" id="btn-input" class="px-5 py-2.5 rounded-xl font-bold text-sm transition shadow bg-emerald-700 text-white">
+                👨‍🏫 Guru: Input Laporan Harian
+            </button>
+            <button onclick="switchView('eval')" id="btn-eval" class="px-5 py-2.5 rounded-xl font-bold text-sm transition shadow bg-white text-slate-700 border hover:bg-slate-100">
+                📊 Guru: Evaluasi (Harian/Pekanan/Bulanan)
+            </button>
+            <button onclick="switchView('ortu')" id="btn-ortu" class="px-5 py-2.5 rounded-xl font-bold text-sm transition shadow bg-white text-slate-700 border hover:bg-slate-100">
+                👨‍👩‍👧 Orang Tua: Pantau & Beri Komentar
+            </button>
+        </div>
+
+        <!-- ================= 1. PANEL INPUT GURU (1 - 8 SISWA) ================= -->
+        <div id="panel-input" class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 mb-6 border-b gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-emerald-800">📝 Form Input Laporan Harian Siswa</h2>
+                    <p class="text-xs text-slate-500">Pilih jumlah siswa yang hadir dalam halaqah (fleksibel 1 sampai 8 siswa)</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <label class="text-xs font-semibold uppercase text-slate-600">Jumlah Siswa:</label>
+                    <select id="jumlah-siswa" onchange="generateFormSiswa()" class="px-3 py-1.5 border rounded-lg text-sm font-bold bg-emerald-50 text-emerald-800 focus:ring-2 focus:ring-emerald-500">
+                        <option value="1">1 Siswa</option>
+                        <option value="2">2 Siswa</option>
+                        <option value="3">3 Siswa</option>
+                        <option value="4">4 Siswa</option>
+                        <option value="5">5 Siswa</option>
+                        <option value="6" selected>6 Siswa (1 Halaqah)</option>
+                        <option value="7">7 Siswa</option>
+                        <option value="8">8 Siswa</option>
+                    </select>
+                </div>
+            </div>
+
+            <form id="form-laporan-guru" onsubmit="simpanDataMassal(event)" class="space-y-6">
+                <!-- Informasi Pengajar & Tanggal Bersama -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nama Guru Pembimbing</label>
+                        <input type="text" id="g-nama-guru" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white" placeholder="Masukkan nama guru pembimbing...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Tanggal Kegiatan</label>
+                        <input type="date" id="g-tgl-bersama" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                    </div>
+                </div>
+
+                <!-- Container Form Fleksibel per Siswa -->
+                <div id="container-form-siswa" class="space-y-6">
+                    <!-- Generasi form dinamis via JavaScript -->
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
+                    💾 Simpan Seluruh Laporan Sesi Ini
+                </button>
+            </form>
+        </div>
+
+        <!-- ================= 2. PANEL EVALUASI GURU (Harian, Pekanan, Bulanan) ================= -->
+        <div id="panel-eval" class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 mb-8 hidden">
+            <div class="flex flex-col md:flex-row justify-between items-center pb-4 mb-6 border-b gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-emerald-800">📊 Evaluasi Rekap Laporan Tahfidz</h2>
+                    <p class="text-xs text-slate-500">Tinjau perkembangan belajar anak secara harian, pekanan, dan bulanan</p>
+                </div>
+                <div class="flex gap-2">
+                    <select id="filter-kategori-waktu" onchange="renderEvaluasi()" class="px-3 py-2 border rounded-lg text-sm font-semibold bg-slate-50">
+                        <option value="harian">Laporan Harian</option>
+                        <option value="pekanan">Rekap Pekanan (Mingguan)</option>
+                        <option value="bulanan">Rekap Bulanan</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 uppercase text-xs">
+                            <th class="p-3 border">Tanggal / Guru</th>
+                            <th class="p-3 border">Nama Siswa</th>
+                            <th class="p-3 border">Materi & Al-Qira'ah</th>
+                            <th class="p-3 border">Tahsin / Ziyadah / Muraja'ah</th>
+                            <th class="p-3 border">Nilai & Catatan Sikap</th>
+                            <th class="p-3 border">Komentar Orang Tua</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-evaluasi-body">
+                        <!-- Data dimasukkan otomatis melalui JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= 3. PANEL ORANG TUA ================= -->
+        <div id="panel-ortu" class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 mb-8 hidden">
+            <div class="flex flex-col md:flex-row justify-between items-center pb-4 mb-6 border-b gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-emerald-800">👨‍👩‍👧 Dashboard Pemantauan Orang Tua</h2>
+                    <p class="text-xs text-slate-500">Lihat hasil laporan harian guru dan berikan catatan/komentar pemantauan dirumah</p>
+                </div>
+                <div>
+                    <select id="pilih-nama-siswa" onchange="renderLaporanOrtu()" class="px-4 py-2 border rounded-lg text-sm font-bold bg-emerald-50 text-emerald-800 focus:ring-2 focus:ring-emerald-500">
+                        <!-- Dropdown siswa dinamis -->
+                    </select>
+                </div>
+            </div>
+
+            <div id="container-laporan-ortu" class="space-y-6">
+                <!-- Konten laporan siswa terpilih -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Logika Aplikasi -->
+    <script>
+        let dbLaporan = JSON.parse(localStorage.getItem('dbTahfidzAfterSchool')) || [];
+        document.getElementById('g-tgl-bersama').valueAsDate = new Date();
+
+        // Inisialisasi form saat pertama kali dimuat
+        window.onload = function() {
+            generateFormSiswa();
+        };
+
+        function switchView(target) {
+            ['input', 'eval', 'ortu'].forEach(id => {
+                document.getElementById(`panel-${id}`).classList.add('hidden');
+                document.getElementById(`btn-${id}`).className = "px-5 py-2.5 rounded-xl font-bold text-sm transition shadow bg-white text-slate-700 border hover:bg-slate-100";
+            });
+
+            document.getElementById(`panel-${target}`).classList.remove('hidden');
+            document.getElementById(`btn-${target}`).className = "px-5 py-2.5 rounded-xl font-bold text-sm transition shadow bg-emerald-700 text-white";
+
+            if (target === 'eval') renderEvaluasi();
+            if (target === 'ortu') updateDropdownOrtu();
+        }
+
+        // Generator Form Fleksibel (1 - 8 Siswa)
+        function generateFormSiswa() {
+            const jumlah = parseInt(document.getElementById('jumlah-siswa').value);
+            const container = document.getElementById('container-form-siswa');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= jumlah; i++) {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="font-bold text-xs uppercase bg-emerald-200 text-emerald-900 px-2.5 py-1 rounded-md">Siswa ke-${i}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Siswa</label>
+                            <input type="text" id="s-nama-${i}" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white" placeholder="Nama lengkap siswa">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Materi</label>
+                            <input type="text" id="s-materi-${i}" class="w-full px-3 py-2 border rounded-lg text-sm bg-white" placeholder="Contoh: Juz 30 / Jilid Buku">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Al-Qira'ah</label>
+                            <input type="text" id="s-qiraah-${i}" class="w-full px-3 py-2 border rounded-lg text-sm bg-white" placeholder="Contoh: Halaman / Surat & Ayat">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Bacaan</label>
+                            <input type="text" id="s-catatan-baca-${i}" class="w-full px-3 py-2 border rounded-lg text-sm bg-white" placeholder="Catatan kelancaran/tajwid...">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Tahsin / Ziyadah / Muraja'ah</label>
+                            <select id="s-kategori-${i}" class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                                <option value="Tahsin">Tahsin (Perbaikan Bacaan)</option>
+                                <option value="Ziyadah">Ziyadah (Hafalan Baru)</option>
+                                <option value="Muraja'ah">Muraja'ah (Pengulangan Hafalan)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nilai Sikap</label>
+                            <select id="s-nilai-sikap-${i}" class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                                <option value="Sangat Baik">Sangat Baik</option>
+                                <option value="Baik">Baik</option>
+                                <option value="Cukup">Cukup</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Sikap & Karakter</label>
+                            <input type="text" id="s-catatan-sikap-${i}" class="w-full px-3 py-2 border rounded-lg text-sm bg-white" placeholder="Contoh: Disiplin, antusias">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        // Simpan Data Massal
+        function simpanDataMassal(e) {
+            e.preventDefault();
+            const namaGuru = document.getElementById('g-nama-guru').value.trim();
+            const tgl = document.getElementById('g-tgl-bersama').value;
+            const jumlah = parseInt(document.getElementById('jumlah-siswa').value);
+
+            for (let i = 1; i <= jumlah; i++) {
+                const dataSiswa = {
+                    id: Date.now() + i,
+                    guru: namaGuru,
+                    tgl: tgl,
+                    nama: document.getElementById(`s-nama-${i}`).value.trim(),
+                    materi: document.getElementById(`s-materi-${i}`).value || '-',
+                    qiraah: document.getElementById(`s-qiraah-${i}`).value || '-',
+                    catatanBacaan: document.getElementById(`s-catatan-baca-${i}`).value || '-',
+                    kategori: document.getElementById(`s-kategori-${i}`).value,
+                    nilaiSikap: document.getElementById(`s-nilai-sikap-${i}`).value,
+                    catatanSikap: document.getElementById(`s-catatan-sikap-${i}`).value || '-',
+                    komentarOrtu: ''
+                };
+                dbLaporan.unshift(dataSiswa);
+            }
+
+            localStorage.setItem('dbTahfidzAfterSchool', JSON.stringify(dbLaporan));
+            alert('Semua laporan harian siswa berhasil disimpan dengan rapi!');
+            document.getElementById('form-laporan-guru').reset();
+            document.getElementById('g-tgl-bersama').valueAsDate = new Date();
+            generateFormSiswa();
+        }
+
+        // Evaluasi Guru
+        function renderEvaluasi() {
+            const tbody = document.getElementById('tabel-evaluasi-body');
+            tbody.innerHTML = '';
+
+            if (dbLaporan.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Belum ada data laporan tersimpan.</td></tr>`;
+                return;
+            }
+
+            dbLaporan.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-slate-50 text-xs";
+                tr.innerHTML = `
+                    <td class="p-3 border font-medium">${item.tgl}<br><span class="text-slate-400">Guru: ${item.guru}</span></td>
+                    <td class="p-3 border font-bold text-emerald-800 text-sm">${item.nama}</td>
+                    <td class="p-3 border"><strong>Materi:</strong> ${item.materi}<br><strong>Qira'ah:</strong> ${item.qiraah}</td>
+                    <td class="p-3 border"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-semibold">${item.kategori}</span><br><span class="text-slate-500">${item.catatanBacaan}</span></td>
+                    <td class="p-3 border"><strong>${item.nilaiSikap}</strong><br><span class="text-slate-500">${item.catatanSikap}</span></td>
+                    <td class="p-3 border italic text-slate-600">${item.komentarOrtu || '<span class="text-slate-400 not-italic">Belum ada komentar</span>'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Panel Orang Tua
+        function updateDropdownOrtu() {
+            const select = document.getElementById('pilih-nama-siswa');
+            select.innerHTML = '';
+            const listSiswa = [...new Set(dbLaporan.map(i => i.nama))];
+
+            if (listSiswa.length === 0) {
+                select.innerHTML = '<option>Belum ada data siswa</option>';
+                document.getElementById('container-laporan-ortu').innerHTML = `<div class="text-center py-10 text-slate-400 text-sm">Belum ada laporan dari guru.</div>`;
+                return;
+            }
+
+            listSiswa.forEach(nama => {
+                const opt = document.createElement('option');
+                opt.value = nama;
+                opt.textContent = nama;
+                select.appendChild(opt);
+            });
+
+            renderLaporanOrtu();
+        }
+
+        function renderLaporanOrtu() {
+            const namaTerpilih = document.getElementById('pilih-nama-siswa').value;
+            const container = document.getElementById('container-laporan-ortu');
+            container.innerHTML = '';
+
+            const laporanSiswa = dbLaporan.filter(i => i.nama === namaTerpilih);
+
+            if (laporanSiswa.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm">Tidak ada catatan laporan untuk siswa ini.</div>`;
+                return;
+            }
+
+            laporanSiswa.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "border rounded-xl p-5 bg-slate-50 shadow-sm space-y-4";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start border-b pb-3">
+                        <div>
+                            <h3 class="font-bold text-emerald-900 text-base">📅 Tanggal: ${item.tgl}</h3>
+                            <span class="text-xs text-slate-500">Guru Pembimbing: ${item.guru}</span>
+                        </div>
+                        <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">${item.kategori}</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-white p-3 rounded-lg border">
+                        <div><strong class="text-slate-400 block">Materi & Al-Qira'ah:</strong> ${item.materi} (${item.qiraah})</div>
+                        <div><strong class="text-slate-400 block">Catatan Bacaan:</strong> ${item.catatanBacaan}</div>
+                    </div>
+
+                    <div class="text-xs bg-amber-50 text-amber-900 p-2.5 rounded-lg border border-amber-200">
+                        <strong>Nilai & Catatan Sikap (${item.nilaiSikap}):</strong> ${item.catatanSikap}
+                    </div>
+
+                    <!-- Kolom Komentar Orang Tua -->
+                    <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 space-y-2">
+                        <label class="block text-xs font-bold text-emerald-900">💬 Komen
